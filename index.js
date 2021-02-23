@@ -27,6 +27,18 @@ app.get('/', (req, res) => {
     //res.send('Salesforce integration with node js')
 })
 
+app.get('/create', (req, res) => {
+    conn.sobject("Account").create({ Name: 'Template Account for creation 1', Industry: 'Banking', Type: 'Prospect' }, (err, result) => {
+            if(err || !result.success){
+                res.send(err)
+            } else {
+                //console.log('Success:', result)
+                console.log(`Success: ${result}`)
+                res.send(result.id)
+            }
+    })
+})
+
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`)
 })
