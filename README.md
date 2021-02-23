@@ -2,7 +2,7 @@ steps to install:
 
 npm init -y (it will prepopulate the package.json file) <br />
 npm install express jsforce dotenv <br />
-npm index.js (run the server) <br />
+node index.js (run the server) <br />
 
 
 logic steps: <br />
