@@ -1,11 +1,12 @@
 steps to install:
 
-npm init -y (it will prepopulate the package.json file)
-npm install express jsforce dotenv
-node index.js (run the server)
+npm init -y (it will prepopulate the package.json file) <br />
+npm install express jsforce dotenv <br />
+npm index.js (run the server) <br />
 
-logic steps:
 
-create connection variable conn with login url 
-access the variable login function with Salesforce username, password and token (password+token)
-use the variable conn query function to retrieve account data from the salesforce org
+logic steps: <br />
+
+create connection variable conn with login url  <br />
+access the variable login function with Salesforce username, password and token (password+token) <br />
+use the variable conn query function to retrieve account data from the salesforce org <br />
