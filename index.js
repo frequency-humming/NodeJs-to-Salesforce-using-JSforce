@@ -1,7 +1,10 @@
 const express = require('express')
 const jsforce = require('jsforce')
 require('dotenv').config()
+
 const app = express()
+app.set('views', __dirname + '/views')
+app.set('view engine', 'ejs')
 const PORT = 3001
 const { SF_LOGIN_URL, SF_USERNAME, SF_PASSWORD, SF_TOKEN } = process.env
 const conn = new jsforce.Connection({
@@ -16,12 +19,24 @@ conn.login(SF_USERNAME, SF_PASSWORD+SF_TOKEN, (err, userInfo) => {
     }
 })
 app.get('/', (req, res) => {
-    conn.query("SELECT Id, Name FROM Account", (err, result) => {
+    conn.query("SELECT Id, Name, Industry FROM Account", (err, result) => {
         if(err){
             res.send(err)
         } else {
             console.log("Total records"+ result.totalSize)
-            res.json(result.records)
+            let data = new Array()
+            for(x in result.records){
+                data.push(
+                    {
+                        account:x,
+                        name:result.records[x].Name,
+                        industry:result.records[x].Industry
+                    }
+                )
+                
+            }
+            console.log(JSON.stringify(data))
+            res.render("home", {data:data}) 
         }
     })
     //res.send('Salesforce integration with node js')
