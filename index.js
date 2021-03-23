@@ -19,7 +19,7 @@ conn.login(SF_USERNAME, SF_PASSWORD+SF_TOKEN, (err, userInfo) => {
     }
 })
 app.get('/', (req, res) => {
-    conn.query("SELECT Id, Name, Industry FROM Account", (err, result) => {
+    conn.query("SELECT Id, Name, Industry, Type, Rating FROM Account", (err, result) => {
         if(err){
             res.send(err)
         } else {
@@ -30,7 +30,9 @@ app.get('/', (req, res) => {
                     {
                         account:x,
                         name:result.records[x].Name,
-                        industry:result.records[x].Industry
+                        industry:result.records[x].Industry,
+                        type: result.records[x].Type,
+                        rating: result.records[x].Rating
                     }
                 )
                 

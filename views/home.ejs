@@ -20,6 +20,9 @@
         tr:nth-child(even) {
           background-color: #dddddd;
         }
+        h1 {
+            text-align: center;
+        }
         </style>
 </head>
 <body>
@@ -30,11 +33,15 @@
                 <tr>
                   <th>Company</th>
                   <th>Industry</th>
+                  <th>Type</th>
+                  <th>Rating</th>
                 </tr>
                 <% for (index in data) {%>
                 <tr>
                   <td><%= data[index].name %></td>
                   <td><%= data[index].industry %></td>
+                  <td><%= data[index].type %></td>
+                  <td><%= data[index].rating %></td>
                 </tr>
                 <% } %>
               </table>   
