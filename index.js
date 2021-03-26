@@ -1,20 +1,27 @@
 const express = require('express')
 const jsforce = require('jsforce')
 require('dotenv').config()
+var bodyParser = require('body-parser')
 const app = express()
+require('./config/mongoose.js')
+const mongoose = require('mongoose')
+Log = mongoose.model('Log')
+const PORT = 3001
 app.set('views', __dirname + '/views')
 app.set('view engine', 'ejs')
-const PORT = 3001
+
 const { SF_LOGIN_URL, SF_USERNAME, SF_PASSWORD, SF_TOKEN } = process.env
 const conn = new jsforce.Connection({
     loginUrl: SF_LOGIN_URL
 })
 
+app.locals.message = 'String of Purses';
+
 conn.login(SF_USERNAME, SF_PASSWORD+SF_TOKEN, (err, userInfo) => {
     if(err){
         console.error(err)
     } else {
-        conn.streaming.topic("/event/Account_News__e").subscribe(function(message){
+        conn.streaming.topic('/event/Account_News__e').subscribe(function(message){
             console.log(message);
         })
         console.log('User ID: '+userInfo.id)
@@ -58,6 +65,18 @@ app.get('/create', (req, res) => {
     })
 })
 
+app.get('/logs',(req,res)=>{
+    var log = new Log({id:'1234567',user:'bruno',event:'test2',body:'first test with atlas 2'});
+    log.save(function(err){
+        if(err){
+            console.log('error: '+err)
+        }else{
+            console.log('success')
+            res.redirect('/')
+        }
+    })
+})
+
 app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`)
+   console.log(`Server is running at http://localhost:${PORT}`)
 })
