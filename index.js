@@ -64,9 +64,23 @@ app.get('/create', (req, res) => {
             }
     })
 })
-
+var _request = {
+    url: '/services/data/v50.0/tooling/sobjects/ApexLog/07L5Y00004hd6PrUAI/Body',
+    method: 'get',
+    body: '',
+    headers : {
+            "Content-Type" : "application/json"
+        }
+  };
+var response
 app.get('/logs',(req,res)=>{
-    var log = new Log({id:'1234567',user:'bruno',event:'test2',body:'first test with atlas 2'});
+    conn.request(_request, function(err,resp){
+        console.log(resp);
+        response = JSON.stringify(resp)
+        res.json(response)
+    })
+    //---------------------------------------------------------------------------------------------
+    /*var log = new Log({id:'1234567',user:'bruno',event:'test2',body:'first test with atlas 2'});
     log.save(function(err){
         if(err){
             console.log('error: '+err)
@@ -74,7 +88,7 @@ app.get('/logs',(req,res)=>{
             console.log('success')
             res.redirect('/')
         }
-    })
+    })*/
 })
 
 app.listen(PORT, () => {
