@@ -17,4 +17,18 @@ SELECT Id, LogUserId,StartTime, LogUser.Name, LogLength, Operation ,Request, App
 
 For the Body: GET /services/data/v50.0/tooling/sobjects/ApexLog/07L5Y00004hdTKLUA2/Body
 
+tooling request:
+
+var requestURL = {
+    url: '/services/data/v50.0/tooling/sobjects/ApexLog/07L5Y00004hd6PrUAI/Body',
+    method: 'get',
+    body: '',
+    headers : {
+            "Content-Type" : "application/json"
+        }
+  };
+
+conn.request(requestURL, function(err,resp)
+
+
 

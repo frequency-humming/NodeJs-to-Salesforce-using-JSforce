@@ -5,6 +5,7 @@ var bodyParser = require('body-parser')
 const app = express()
 require('./config/mongoose.js')
 const mongoose = require('mongoose')
+const { Cursor } = require('mongodb')
 Log = mongoose.model('Log')
 const PORT = 3001
 app.set('views', __dirname + '/views')
@@ -45,7 +46,6 @@ app.get('/', (req, res) => {
                         rating: result.records[x].Rating
                     }
                 )
-                
             }
             console.log(JSON.stringify(data))
             res.render("home", {data:data}) 
@@ -64,32 +64,65 @@ app.get('/create', (req, res) => {
             }
     })
 })
-var _request = {
-    url: '/services/data/v50.0/tooling/sobjects/ApexLog/07L5Y00004hd6PrUAI/Body',
-    method: 'get',
-    body: '',
-    headers : {
-            "Content-Type" : "application/json"
-        }
-  };
-var response
+
 app.get('/logs',(req,res)=>{
-    conn.request(_request, function(err,resp){
-        console.log(resp);
-        response = JSON.stringify(resp)
-        res.json(response)
-    })
-    //---------------------------------------------------------------------------------------------
-    /*var log = new Log({id:'1234567',user:'bruno',event:'test2',body:'first test with atlas 2'});
-    log.save(function(err){
+    conn.query("SELECT Id, LogUserId, StartTime, LogUser.Name, LogLength, Operation, Request,\
+    Application, Status, Location FROM ApexLog", (err, result) => {
         if(err){
-            console.log('error: '+err)
+            console.log('error',err)
+            res.json(err)
         }else{
-            console.log('success')
-            res.redirect('/')
+            let data = new Array();
+            for(x in result.records){
+                data.push(
+                    {
+                        id:result.records[x].Id,
+                        user:result.records[x].LogUserId,
+                        event:result.records[x].Operation,
+                        body: ''
+                    }
+                )
+            }
+            let count = data.length;
+            for(var i = 0; i < count; i++){
+                find(data[i])
+            }
+            res.json(data);
         }
-    })*/
+    })
 })
+async function find(data){
+    try{
+        await Log.find({_id:data.id}, function(err,res){
+            if(err){
+                console.log(err)
+            } else{
+                console.log('2323232323232323',res)
+                console.log(res.length)
+                if(res.length === 0){
+                    new Log({_id:data.id,user:data.user,event:data.event,body:'0'}).save();
+                }
+            }
+        })
+    }
+     catch(e){
+        console.log(e)
+    }
+}
+/*app.get('/logs/{id}/body', (req,res) => {
+    var requestURL = {
+        url: '/services/data/v50.0/tooling/sobjects/ApexLog/'+''+'/Body',
+        method: 'get',
+        body: '',
+        headers : {
+                "Content-Type" : "application/json"
+            }
+    };
+    conn.request(requestURL, function(err,resp){ 
+        const index= data.findIndex((e) => e.id === '07L5Y00004hd6PrUAI')
+        data[index].body = 'resp'    
+    })
+})*/
 
 app.listen(PORT, () => {
    console.log(`Server is running at http://localhost:${PORT}`)
