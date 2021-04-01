@@ -64,7 +64,7 @@ app.get('/create', (req, res) => {
             }
     })
 })
-
+let data = new Array();
 app.get('/logs',(req,res)=>{
     conn.query("SELECT Id, LogUserId, StartTime, LogUser.Name, LogLength, Operation, Request,\
     Application, Status, Location FROM ApexLog", (err, result) => {
@@ -72,7 +72,7 @@ app.get('/logs',(req,res)=>{
             console.log('error',err)
             res.json(err)
         }else{
-            let data = new Array();
+            //let data = new Array();
             for(x in result.records){
                 data.push(
                     {
@@ -85,33 +85,43 @@ app.get('/logs',(req,res)=>{
             }
             let count = data.length;
             for(var i = 0; i < count; i++){
-                find(data[i])
+                find(data[i],"event")
             }
-            res.json(data);
+            res.render('logs',{data:data});
         }
     })
 })
-async function find(data){
+async function find(data,string){
     try{
         await Log.find({_id:data.id}, function(err,res){
             if(err){
                 console.log(err)
-            } else{
-                console.log('2323232323232323',res)
+            } else{ 
                 console.log(res.length)
-                if(res.length === 0){
+                if(res.length === 0 && string == "event"){
                     new Log({_id:data.id,user:data.user,event:data.event,body:'0'}).save();
+                    console.log('created');
+                } else if(res.length === 1 && string == "body"){
+                    Log.updateOne({_id:data.id},{body:data.body}, function(err,res){
+                        if(err){
+                            console.log('error: ',err)
+                        }else{
+                            console.log('response from update:',res)
+                        }
+                    });
                 }
             }
         })
     }
-     catch(e){
-        console.log(e)
+    catch(e){
+        console.log('error find function: ',e)
+        throw e;
     }
 }
-/*app.get('/logs/{id}/body', (req,res) => {
+
+app.get('/logs/:Id/body', (req,res) => {
     var requestURL = {
-        url: '/services/data/v50.0/tooling/sobjects/ApexLog/'+''+'/Body',
+        url: '/services/data/v50.0/tooling/sobjects/ApexLog/'+req.params.Id+'/Body',
         method: 'get',
         body: '',
         headers : {
@@ -119,10 +129,31 @@ async function find(data){
             }
     };
     conn.request(requestURL, function(err,resp){ 
-        const index= data.findIndex((e) => e.id === '07L5Y00004hd6PrUAI')
-        data[index].body = 'resp'    
+        if(err){
+            console.log(err);
+            res.json(err);
+        }
+        findBody(resp,req.params.Id);
+        res.json(resp);
     })
-})*/
+})
+function findBody(Bodydata,logId){
+    try{
+        let logBody = Bodydata;
+        const index = data.findIndex((e) => e.id === logId)
+        if(index < 0){
+            return 'Must go to the /logs and pick an ID from the List';
+        }
+        data[index].body = logBody
+        console.log(data[index])
+        find(data[index],"body")
+    }
+    catch(e){
+        console.log('error',e)
+        throw new Error('call the logs page first')
+    }
+    
+}  
 
 app.listen(PORT, () => {
    console.log(`Server is running at http://localhost:${PORT}`)
